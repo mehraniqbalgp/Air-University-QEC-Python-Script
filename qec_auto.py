@@ -2,8 +2,8 @@ from playwright.sync_api import sync_playwright
 import time
 
 # User Credentials
-USERNAME = "242352"
-PASSWORD = "wno72but73"
+USERNAME = "roll_no_here"
+PASSWORD = "qec_portal_password_here"
 
 def run_qec_automation():
     with sync_playwright() as p:
