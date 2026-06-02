@@ -1,3 +1,13 @@
+---
+title: QEC Automation
+emoji: 🚀
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # QEC Automation Web App
 
 A full-stack web application designed for securely automating QEC (Quality Enhancement Cell) surveys on the Air University portal. 
