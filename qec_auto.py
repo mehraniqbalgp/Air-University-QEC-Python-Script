@@ -1,14 +1,12 @@
+import argparse
 from playwright.sync_api import sync_playwright
 import time
+import sys
 
-# User Credentials
-USERNAME = "roll_no_here"
-PASSWORD = "qec_portal_password_here"
-
-def run_qec_automation():
+def run_qec_automation(username, password):
     with sync_playwright() as p:
         # Launch browser
-        browser = p.chromium.launch(headless=False, slow_mo=50) # Set headless=True for background
+        browser = p.chromium.launch(headless=True, slow_mo=50) # Running headless for the background app
         context = browser.new_context()
         page = context.new_page()
 
@@ -16,14 +14,21 @@ def run_qec_automation():
         page.on("dialog", lambda dialog: dialog.accept())
 
         # 1. LOGIN
-        print("Logging in...")
+        print(f"Logging in user {username}...")
         page.goto("https://portals.au.edu.pk/QEC/login.aspx")
         page.select_option("#ctl00_ContentPlaceHolder2_ddlcampus", value="Islamabad")
         page.select_option("#ctl00_ContentPlaceHolder2_ddlUserType", value="Student/Alumni")
-        page.fill("#ctl00_ContentPlaceHolder2_txt_regid", USERNAME)
-        page.fill("#ctl00_ContentPlaceHolder2_txt_password", PASSWORD)
+        page.fill("#ctl00_ContentPlaceHolder2_txt_regid", username)
+        page.fill("#ctl00_ContentPlaceHolder2_txt_password", password)
         page.click("#ctl00_ContentPlaceHolder2_btnAccountlogin")
         page.wait_for_load_state("networkidle")
+        
+        # Simple check if login failed (e.g. invalid credentials)
+        if page.locator("#ctl00_ContentPlaceHolder2_txt_regid").count() > 0:
+             print("Login failed! Please check your credentials.")
+             browser.close()
+             sys.exit(1)
+             
         print("Login successful.")
 
         # --- SECTION: Student Course Evaluation ---
@@ -106,8 +111,6 @@ def fill_teacher_eval(page):
         if not to_eval_course:
             # Maybe it reloaded and teacher disappeared? Or no courses?
             print("No courses found for this teacher.")
-            # We need to skip this teacher somehow if it keeps appearing? Usually it disappears after submit.
-            # But if no courses, it might be stuck. Let's try to just break and hope it's rare.
             break
 
         print(f"  Course: {to_eval_course[0]['text']}")
@@ -172,4 +175,10 @@ def fill_online_learning(page):
         time.sleep(2)
 
 if __name__ == "__main__":
-    run_qec_automation()
+    parser = argparse.ArgumentParser(description="QEC Automation Script")
+    parser.add_argument("--username", required=True, help="Portal Registration ID")
+    parser.add_argument("--password", required=True, help="Portal Password")
+    args = parser.parse_args()
+    
+    run_qec_automation(args.username, args.password)
+

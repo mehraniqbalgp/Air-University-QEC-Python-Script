@@ -1,0 +1,21 @@
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.18.74:5000
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 139-576-516
+192.168.18.74 - - [02/Jun/2026 20:19:15] "GET / HTTP/1.1" 200 -
+/usr/lib/python3.13/subprocess.py:1029: RuntimeWarning: line buffering (buffering=1) isn't supported in binary mode, the default buffer size will be used
+  self.stdout = io.open(c2pread, 'rb', bufsize)
+192.168.18.74 - - [02/Jun/2026 20:19:29] "POST /submit HTTP/1.1" 200 -
+192.168.18.74 - - [02/Jun/2026 20:19:29] "GET /stream/8d413f83-54b7-4638-84a5-13e57c3e162e HTTP/1.1" 200 -
+192.168.18.74 - - [02/Jun/2026 20:19:46] "GET / HTTP/1.1" 200 -
+192.168.18.74 - - [02/Jun/2026 20:20:04] "POST /submit HTTP/1.1" 200 -
+192.168.18.74 - - [02/Jun/2026 20:20:05] "GET /stream/b04a153d-fe8a-4cbc-8316-210427bc5cda HTTP/1.1" 200 -
+192.168.18.74 - - [02/Jun/2026 20:25:20] "GET / HTTP/1.1" 200 -
+192.168.18.74 - - [02/Jun/2026 20:25:28] "POST /submit HTTP/1.1" 200 -
+192.168.18.74 - - [02/Jun/2026 20:25:28] "GET /stream/5607c37b-b432-4f1b-b721-91876fbcb2f0 HTTP/1.1" 200 -

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QEC Auto-Filler</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        /* Glassmorphism card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            text-align: center;
+            transition: transform 0.3s ease, max-width 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #d1d1d1;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #e0e0e0;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            outline: none;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .input-group input:focus {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s, transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* Terminal styles */
+        #terminal-container {
+            display: none;
+            text-align: left;
+            margin-top: 20px;
+        }
+        
+        .terminal {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 15px;
+            height: 250px;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #00ff00;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .terminal-line {
+            margin-bottom: 4px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            display: none;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .status-message.success {
+            display: block;
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid rgba(46, 204, 113, 0.5);
+            color: #2ecc71;
+        }
+
+        .status-message.error {
+            display: block;
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            color: #e74c3c;
+        }
+
+        /* Decorative circles */
+        .circle1, .circle2 {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+        }
+
+        .circle1 {
+            width: 300px;
+            height: 300px;
+            background: #00c6ff;
+            top: -100px;
+            left: -100px;
+        }
+
+        .circle2 {
+            width: 400px;
+            height: 400px;
+            background: #0072ff;
+            bottom: -150px;
+            right: -100px;
+        }
+        
+        .restart-btn {
+            display: none;
+            background: rgba(255, 255, 255, 0.2);
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+
+    <div class="glass-card" id="main-card">
+        <div class="logo">QEC Auto-Filler</div>
+        <div class="subtitle">Securely automate your Air University QEC surveys.</div>
+        
+        <form id="qec-form">
+            <div class="input-group">
+                <label for="username">Registration ID</label>
+                <input type="text" id="username" name="username" placeholder="e.g. 242334" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Portal Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submit-btn">Start Automation</button>
+        </form>
+        
+        <div id="status-box" class="status-message"></div>
+        
+        <div id="terminal-container">
+            <div style="margin-bottom: 10px; font-weight: 600; font-size: 0.9rem;">Live Log Output:</div>
+            <div class="terminal" id="terminal"></div>
+            <button class="submit-btn restart-btn" id="restart-btn" onclick="location.reload()">Run Another</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('qec-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const submitBtn = document.getElementById('submit-btn');
+            const statusBox = document.getElementById('status-box');
+            
+            const formData = new FormData(form);
+            
+            submitBtn.innerText = 'Starting...';
+            submitBtn.disabled = true;
+            statusBox.className = 'status-message'; // reset
+            
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    form.reset(); // Clear credentials immediately
+                    
+                    // Hide form, show terminal
+                    form.style.display = 'none';
+                    document.getElementById('terminal-container').style.display = 'block';
+                    document.getElementById('main-card').style.maxWidth = '600px'; // widen card for terminal
+                    
+                    const terminal = document.getElementById('terminal');
+                    terminal.innerHTML = '<div class="terminal-line">Connecting to automation engine...</div>';
+                    
+                    // Connect to SSE stream
+                    const evtSource = new EventSource('/stream/' + data.task_id);
+                    
+                    evtSource.onmessage = function(event) {
+                        const line = event.data;
+                        
+                        if (line === "[PROCESS_COMPLETED]") {
+                            terminal.innerHTML += '<div class="terminal-line" style="color: #00ffff;">Automation completed successfully!</div>';
+                            evtSource.close();
+                            document.getElementById('restart-btn').style.display = 'block';
+                            return;
+                        }
+                        
+                        if (line === "[PROCESS_FAILED]") {
+                            terminal.innerHTML += '<div class="terminal-line" style="color: #ff3333;">Automation failed. Check your credentials.</div>';
+                            evtSource.close();
+                            document.getElementById('restart-btn').style.display = 'block';
+                            return;
+                        }
+                        
+                        terminal.innerHTML += '<div class="terminal-line">' + escapeHTML(line) + '</div>';
+                        // Auto-scroll to bottom
+                        terminal.scrollTop = terminal.scrollHeight;
+                    };
+                    
+                    evtSource.onerror = function(err) {
+                        console.error("EventSource failed:", err);
+                        evtSource.close();
+                    };
+                    
+                } else {
+                    statusBox.innerText = data.message || 'An error occurred';
+                    statusBox.classList.add('error');
+                    submitBtn.innerText = 'Start Automation';
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                statusBox.innerText = 'Network error. Please try again.';
+                statusBox.classList.add('error');
+                submitBtn.innerText = 'Start Automation';
+                submitBtn.disabled = false;
+            }
+        });
+        
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag])
+            );
+        }
+    </script>
+</body>
+</html>
