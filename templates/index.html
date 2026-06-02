@@ -3,222 +3,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QEC Auto-Filler</title>
+    <title>QEC Auto-Filler | Premium</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Inter', sans-serif;
+            background: #09090b;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            color: #fff;
+            min-height: 100vh;
+            color: #fafafa;
             overflow: hidden;
+            position: relative;
         }
 
-        /* Glassmorphism card */
+        /* Animated Background Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.6;
+            z-index: 0;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: #4f46e5; /* Indigo */
+            top: -100px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: #0ea5e9; /* Sky Blue */
+            bottom: -200px;
+            right: -200px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: #8b5cf6; /* Violet */
+            top: 40%;
+            left: 60%;
+            animation-delay: -2s;
+            filter: blur(120px);
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -50px) scale(1.1); }
+        }
+
+        /* Glassmorphism Card */
         .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
             padding: 40px;
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            max-width: 440px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             text-align: center;
-            transition: transform 0.3s ease, max-width 0.3s ease;
+            position: relative;
+            z-index: 10;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        .glass-card:hover {
-            transform: translateY(-5px);
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .logo {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
+        .glass-card.expanded {
+            max-width: 650px;
         }
 
-        .subtitle {
-            font-size: 0.9rem;
-            color: #d1d1d1;
+        .logo-container {
             margin-bottom: 30px;
         }
 
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #a1a1aa;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        /* Form Inputs */
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             text-align: left;
+            position: relative;
         }
 
         .input-group label {
             display: block;
             margin-bottom: 8px;
             font-size: 0.85rem;
-            color: #e0e0e0;
+            font-weight: 500;
+            color: #d4d4d8;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .input-group input {
             width: 100%;
-            padding: 12px 15px;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.15);
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
             color: #fff;
             outline: none;
             font-size: 1rem;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .input-group input:focus {
-            background: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.4);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .input-group input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
+            color: #71717a;
         }
 
+        /* Animated Button */
         .submit-btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
             color: white;
+            font-family: 'Outfit', sans-serif;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: opacity 0.3s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.5);
             margin-top: 10px;
         }
 
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.5s ease;
+        }
+
         .submit-btn:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -10px rgba(99, 102, 241, 0.6);
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
         }
 
         .submit-btn:active {
-            transform: scale(0.98);
-        }
-        
-        /* Terminal styles */
-        #terminal-container {
-            display: none;
-            text-align: left;
-            margin-top: 20px;
-        }
-        
-        .terminal {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 10px;
-            padding: 15px;
-            height: 250px;
-            overflow-y: auto;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            color: #00ff00;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .terminal-line {
-            margin-bottom: 4px;
-            line-height: 1.4;
-            word-wrap: break-word;
+            transform: translateY(1px);
         }
 
+        /* Status Messages */
         .status-message {
             margin-top: 20px;
             font-size: 0.9rem;
             display: none;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .status-message.success {
-            display: block;
-            background: rgba(46, 204, 113, 0.2);
-            border: 1px solid rgba(46, 204, 113, 0.5);
-            color: #2ecc71;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease forwards;
         }
 
         .status-message.error {
             display: block;
-            background: rgba(231, 76, 60, 0.2);
-            border: 1px solid rgba(231, 76, 60, 0.5);
-            color: #e74c3c;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
         }
 
-        /* Decorative circles */
-        .circle1, .circle2 {
-            position: absolute;
+        /* Sleek Terminal */
+        #terminal-container {
+            display: none;
+            text-align: left;
+            margin-top: 10px;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            background: rgba(24, 24, 27, 0.8);
+            padding: 10px 15px;
+            border-radius: 12px 12px 0 0;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-bottom: none;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            filter: blur(80px);
-            z-index: -1;
         }
 
-        .circle1 {
-            width: 300px;
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+
+        .terminal-title {
+            margin-left: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: #71717a;
+        }
+
+        .terminal {
+            background: rgba(9, 9, 11, 0.9);
+            padding: 20px;
             height: 300px;
-            background: #00c6ff;
-            top: -100px;
-            left: -100px;
-        }
-
-        .circle2 {
-            width: 400px;
-            height: 400px;
-            background: #0072ff;
-            bottom: -150px;
-            right: -100px;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #a78bfa;
+            border-radius: 0 0 12px 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
         }
         
+        .terminal::-webkit-scrollbar {
+            width: 6px;
+        }
+        .terminal::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .terminal::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .terminal-line {
+            margin-bottom: 6px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            opacity: 0;
+            animation: slideInRight 0.3s ease forwards;
+        }
+
+        .terminal-line.success { color: #34d399; }
+        .terminal-line.error { color: #f87171; }
+        .terminal-line.info { color: #e4e4e7; }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .restart-btn {
             display: none;
-            background: rgba(255, 255, 255, 0.2);
-            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: none;
+            margin-top: 20px;
+            color: #e4e4e7;
+        }
+
+        .restart-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
-    <div class="circle1"></div>
-    <div class="circle2"></div>
+    <!-- Animated Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
     <div class="glass-card" id="main-card">
-        <div class="logo">QEC Auto-Filler</div>
-        <div class="subtitle">Securely automate your Air University QEC surveys.</div>
+        <div class="logo-container">
+            <div class="logo">QEC Automator</div>
+            <div class="subtitle">Secure, hands-free evaluation filling.</div>
+        </div>
         
         <form id="qec-form">
             <div class="input-group">
                 <label for="username">Registration ID</label>
-                <input type="text" id="username" name="username" placeholder="e.g. 242334" required>
+                <input type="text" id="username" name="username" placeholder="e.g. 242334" required autocomplete="off">
             </div>
             
             <div class="input-group">
                 <label for="password">Portal Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter password" required>
+                <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="off">
             </div>
             
-            <button type="submit" class="submit-btn" id="submit-btn">Start Automation</button>
+            <button type="submit" class="submit-btn" id="submit-btn">Initialize Automation</button>
         </form>
         
         <div id="status-box" class="status-message"></div>
         
         <div id="terminal-container">
-            <div style="margin-bottom: 10px; font-weight: 600; font-size: 0.9rem;">Live Log Output:</div>
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+                <div class="terminal-title">automation-engine ~ bash</div>
+            </div>
             <div class="terminal" id="terminal"></div>
-            <button class="submit-btn restart-btn" id="restart-btn" onclick="location.reload()">Run Another</button>
+            <button class="submit-btn restart-btn" id="restart-btn" onclick="location.reload()">Initialize New Session</button>
         </div>
     </div>
 
@@ -232,9 +376,10 @@
             
             const formData = new FormData(form);
             
-            submitBtn.innerText = 'Starting...';
+            submitBtn.innerText = 'Authenticating...';
+            submitBtn.style.opacity = '0.7';
             submitBtn.disabled = true;
-            statusBox.className = 'status-message'; // reset
+            statusBox.className = 'status-message'; 
             
             try {
                 const response = await fetch('/submit', {
@@ -245,38 +390,42 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    form.reset(); // Clear credentials immediately
+                    form.reset(); 
                     
-                    // Hide form, show terminal
                     form.style.display = 'none';
+                    document.querySelector('.logo-container').style.display = 'none';
+                    
+                    const card = document.getElementById('main-card');
+                    card.classList.add('expanded');
+                    
                     document.getElementById('terminal-container').style.display = 'block';
-                    document.getElementById('main-card').style.maxWidth = '600px'; // widen card for terminal
                     
                     const terminal = document.getElementById('terminal');
-                    terminal.innerHTML = '<div class="terminal-line">Connecting to automation engine...</div>';
+                    terminal.innerHTML = '<div class="terminal-line info">> establish_connection --secure</div>';
+                    setTimeout(() => {
+                        terminal.innerHTML += '<div class="terminal-line info">> engine initialized. awaiting headless browser...</div>';
+                    }, 600);
                     
-                    // Connect to SSE stream
                     const evtSource = new EventSource('/stream/' + data.task_id);
                     
                     evtSource.onmessage = function(event) {
                         const line = event.data;
                         
                         if (line === "[PROCESS_COMPLETED]") {
-                            terminal.innerHTML += '<div class="terminal-line" style="color: #00ffff;">Automation completed successfully!</div>';
+                            terminal.innerHTML += '<br><div class="terminal-line success">✓ Process terminating with exit code 0.</div>';
                             evtSource.close();
                             document.getElementById('restart-btn').style.display = 'block';
                             return;
                         }
                         
                         if (line === "[PROCESS_FAILED]") {
-                            terminal.innerHTML += '<div class="terminal-line" style="color: #ff3333;">Automation failed. Check your credentials.</div>';
+                            terminal.innerHTML += '<br><div class="terminal-line error">✗ Process terminated with fatal error (Auth/Timeout).</div>';
                             evtSource.close();
                             document.getElementById('restart-btn').style.display = 'block';
                             return;
                         }
                         
-                        terminal.innerHTML += '<div class="terminal-line">' + escapeHTML(line) + '</div>';
-                        // Auto-scroll to bottom
+                        terminal.innerHTML += '<div class="terminal-line info">' + escapeHTML(line) + '</div>';
                         terminal.scrollTop = terminal.scrollHeight;
                     };
                     
@@ -286,15 +435,17 @@
                     };
                     
                 } else {
-                    statusBox.innerText = data.message || 'An error occurred';
+                    statusBox.innerText = data.message || 'Authentication failed.';
                     statusBox.classList.add('error');
-                    submitBtn.innerText = 'Start Automation';
+                    submitBtn.innerText = 'Initialize Automation';
+                    submitBtn.style.opacity = '1';
                     submitBtn.disabled = false;
                 }
             } catch (err) {
-                statusBox.innerText = 'Network error. Please try again.';
+                statusBox.innerText = 'Network error. Engine unreachable.';
                 statusBox.classList.add('error');
-                submitBtn.innerText = 'Start Automation';
+                submitBtn.innerText = 'Initialize Automation';
+                submitBtn.style.opacity = '1';
                 submitBtn.disabled = false;
             }
         });
