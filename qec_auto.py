@@ -1,14 +1,24 @@
 import argparse
 from playwright.sync_api import sync_playwright
+from playwright_stealth import Stealth
 import time
 import sys
-
+from pyvirtualdisplay import Display
 def run_qec_automation(username, password):
+    display = Display(visible=0, size=(1920, 1080))
+    display.start()
+    try:
+        _run_qec_automation_internal(username, password)
+    finally:
+        display.stop()
+
+def _run_qec_automation_internal(username, password):
     with sync_playwright() as p:
-        # Launch browser
-        browser = p.chromium.launch(headless=True, slow_mo=50) # Running headless for the background app
+        # Launch browser in headed mode on xvfb
+        browser = p.chromium.launch(headless=False, slow_mo=50) # Running headed to avoid bot detection
         context = browser.new_context()
         page = context.new_page()
+        Stealth().apply_stealth_sync(page)
 
         # Handle alerts (ASP.NET often uses them)
         page.on("dialog", lambda dialog: dialog.accept())
@@ -16,12 +26,30 @@ def run_qec_automation(username, password):
         # 1. LOGIN
         print(f"Logging in user {username}...")
         page.goto("https://portals.au.edu.pk/QEC/login.aspx")
+        
+        try:
+            page.wait_for_selector("#ctl00_ContentPlaceHolder2_ddlcampus", timeout=15000)
+        except Exception as e:
+            print(f"Error: Could not load login form. Current URL: {page.url}")
+            print(f"Page Title: {page.title()}")
+            print("This usually means Cloudflare is blocking the Cloud/Datacenter IP.")
+            browser.close()
+            sys.exit(1)
+
         page.select_option("#ctl00_ContentPlaceHolder2_ddlcampus", value="Islamabad")
+        time.sleep(1.5) # Wait for possible ASP.NET AutoPostBack
+        
         page.select_option("#ctl00_ContentPlaceHolder2_ddlUserType", value="Student/Alumni")
+        time.sleep(1.5) # Wait for possible ASP.NET AutoPostBack
+        
         page.fill("#ctl00_ContentPlaceHolder2_txt_regid", username)
+        time.sleep(0.5)
         page.fill("#ctl00_ContentPlaceHolder2_txt_password", password)
+        time.sleep(0.5)
+        
         page.click("#ctl00_ContentPlaceHolder2_btnAccountlogin")
         page.wait_for_load_state("networkidle")
+        time.sleep(2)
         
         # Simple check if login failed (e.g. invalid credentials)
         if page.locator("#ctl00_ContentPlaceHolder2_txt_regid").count() > 0:

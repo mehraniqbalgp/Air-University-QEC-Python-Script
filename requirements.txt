@@ -1,2 +1,4 @@
 playwright
 Flask
+playwright-stealth
+pyvirtualdisplay
