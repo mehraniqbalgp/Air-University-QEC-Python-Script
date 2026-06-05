@@ -14,8 +14,8 @@ def run_qec_automation(username, password):
 
 def _run_qec_automation_internal(username, password):
     with sync_playwright() as p:
-        # Launch browser in headed mode on xvfb
-        browser = p.chromium.launch(headless=False, slow_mo=50) # Running headed to avoid bot detection
+        # Launch browser in headed mode on xvfb with QUIC disabled
+        browser = p.chromium.launch(headless=False, slow_mo=50, args=["--disable-quic"]) # Running headed to avoid bot detection
         context = browser.new_context()
         page = context.new_page()
         Stealth().apply_stealth_sync(page)
