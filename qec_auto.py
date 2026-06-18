@@ -1,12 +1,32 @@
 import argparse
-from playwright.sync_api import sync_playwright
+import os
+import shutil
 import time
 import sys
 
+# Playwright 1.60 does not yet ship ubuntu26.04 browser builds; use 24.04 binaries.
+if not os.environ.get("PLAYWRIGHT_HOST_PLATFORM_OVERRIDE") and os.path.isfile("/etc/os-release"):
+    with open("/etc/os-release", encoding="utf-8") as f:
+        if 'VERSION_ID="26.04"' in f.read():
+            os.environ["PLAYWRIGHT_HOST_PLATFORM_OVERRIDE"] = "ubuntu24.04-x64"
+
+from playwright.sync_api import sync_playwright
+
+
+def launch_browser(playwright):
+    """Prefer system Chrome; fall back to Playwright-managed Chromium."""
+    launch_kwargs = {"headless": True, "slow_mo": 50}
+    if shutil.which("google-chrome") or shutil.which("google-chrome-stable"):
+        try:
+            return playwright.chromium.launch(channel="chrome", **launch_kwargs)
+        except Exception:
+            pass
+    return playwright.chromium.launch(**launch_kwargs)
+
+
 def run_qec_automation(username, password):
     with sync_playwright() as p:
-        # Launch browser
-        browser = p.chromium.launch(headless=True, slow_mo=50) # Running headless for the background app
+        browser = launch_browser(p)
         context = browser.new_context()
         page = context.new_page()
 
