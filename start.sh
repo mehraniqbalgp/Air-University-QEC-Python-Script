@@ -18,7 +18,22 @@ source venv/bin/activate
 # Install dependencies
 echo "[3/4] Checking and installing requirements..."
 pip install -r requirements.txt
-playwright install
+
+# Playwright 1.60 does not yet ship ubuntu26.04 browser builds; use 24.04 binaries.
+if [ -f /etc/os-release ] && grep -q 'VERSION_ID="26.04"' /etc/os-release; then
+    export PLAYWRIGHT_HOST_PLATFORM_OVERRIDE="${PLAYWRIGHT_HOST_PLATFORM_OVERRIDE:-ubuntu24.04-x64}"
+    echo "Ubuntu 26.04 detected — using Playwright ubuntu24.04 browser builds."
+fi
+
+if ! playwright install chromium; then
+    echo "Warning: Playwright browser install failed."
+    if command -v google-chrome &>/dev/null || command -v google-chrome-stable &>/dev/null; then
+        echo "System Google Chrome found — automation will use it instead."
+    else
+        echo "Install Google Chrome, or run:"
+        echo "  PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64 playwright install chromium"
+    fi
+fi
 
 # Start the application
 echo "[4/4] Starting the Flask Web Server..."
